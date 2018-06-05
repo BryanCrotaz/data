@@ -1,13 +1,11 @@
 /*eslint no-unused-vars: ["error", { "varsIgnorePattern": "(ada)" }]*/
 
 import { resolve, Promise as EmberPromise } from 'rsvp';
-
 import { run } from '@ember/runloop';
-
+import { get } from '@ember/object';
 import setupStore from 'dummy/tests/helpers/store';
-
 import { module, test } from 'qunit';
-
+import todo from '../../helpers/todo';
 import DS from 'ember-data';
 
 const { attr, hasMany } = DS;
@@ -19,17 +17,17 @@ module('integration/relationships/many_to_many_test - ManyToMany relationships',
     User = DS.Model.extend({
       name: attr('string'),
       topics: hasMany('topic', { async: true }),
-      accounts: hasMany('account', { async: false })
+      accounts: hasMany('account', { async: false }),
     });
 
     Account = DS.Model.extend({
       state: attr(),
-      users: hasMany('user', { async: false })
+      users: hasMany('user', { async: false }),
     });
 
     Topic = DS.Model.extend({
       title: attr('string'),
-      users: hasMany('user', { async: true })
+      users: hasMany('user', { async: true }),
     });
 
     env = setupStore({
@@ -37,8 +35,8 @@ module('integration/relationships/many_to_many_test - ManyToMany relationships',
       topic: Topic,
       account: Account,
       adapter: DS.Adapter.extend({
-        deleteRecord: () => resolve()
-      })
+        deleteRecord: () => resolve(),
+      }),
     });
 
     store = env.store;
@@ -46,34 +44,37 @@ module('integration/relationships/many_to_many_test - ManyToMany relationships',
 
   afterEach() {
     run(() => env.container.destroy());
-  }
+  },
 });
 
 /*
   Server loading tests
 */
 
-test("Loading from one hasMany side reflects on the other hasMany side - async", function(assert) {
+test('Loading from one hasMany side reflects on the other hasMany side - async', function(assert) {
   run(() => {
     store.push({
       data: {
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
+          name: 'Stanley',
         },
         relationships: {
           topics: {
-            data: [{
-              id: '2',
-              type: 'topic'
-            }, {
-              id: '3',
-              type: 'topic'
-            }]
-          }
-        }
-      }
+            data: [
+              {
+                id: '2',
+                type: 'topic',
+              },
+              {
+                id: '3',
+                type: 'topic',
+              },
+            ],
+          },
+        },
+      },
     });
   });
 
@@ -83,9 +84,9 @@ test("Loading from one hasMany side reflects on the other hasMany side - async",
         id: '2',
         type: 'topic',
         attributes: {
-          title: 'EmberFest was great'
-        }
-      }
+          title: 'EmberFest was great',
+        },
+      },
     });
   });
 
@@ -96,7 +97,7 @@ test("Loading from one hasMany side reflects on the other hasMany side - async",
   });
 });
 
-test("Relationship is available from one hasMany side even if only loaded from the other hasMany side - sync", function(assert) {
+test('Relationship is available from one hasMany side even if only loaded from the other hasMany side - sync', function(assert) {
   var account;
   run(() => {
     account = store.push({
@@ -104,26 +105,28 @@ test("Relationship is available from one hasMany side even if only loaded from t
         id: '2',
         type: 'account',
         attributes: {
-          state: 'lonely'
-        }
-      }
+          state: 'lonely',
+        },
+      },
     });
     store.push({
       data: {
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
+          name: 'Stanley',
         },
         relationships: {
           accounts: {
-            data: [{
-              id: '2',
-              type: 'account'
-            }]
-          }
-        }
-      }
+            data: [
+              {
+                id: '2',
+                type: 'account',
+              },
+            ],
+          },
+        },
+      },
     });
   });
 
@@ -132,7 +135,7 @@ test("Relationship is available from one hasMany side even if only loaded from t
   });
 });
 
-test("Fetching a hasMany where a record was removed reflects on the other hasMany side - async", function(assert) {
+test('Fetching a hasMany where a record was removed reflects on the other hasMany side - async', function(assert) {
   let user, topic;
 
   run(() => {
@@ -141,31 +144,28 @@ test("Fetching a hasMany where a record was removed reflects on the other hasMan
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
+          name: 'Stanley',
         },
         relationships: {
           topics: {
-            data: [{
-              id: '2',
-              type: 'topic'
-            }]
-          }
-        }
-      }
+            data: [{ id: '2', type: 'topic' }],
+          },
+        },
+      },
     });
     topic = store.push({
       data: {
         id: '2',
         type: 'topic',
         attributes: {
-          title: 'EmberFest was great'
+          title: 'EmberFest was great',
         },
         relationships: {
           users: {
-            data: []
-          }
-        }
-      }
+            data: [],
+          },
+        },
+      },
     });
   });
 
@@ -181,7 +181,7 @@ test("Fetching a hasMany where a record was removed reflects on the other hasMan
   });
 });
 
-test("Fetching a hasMany where a record was removed reflects on the other hasMany side - sync", function(assert) {
+test('Fetching a hasMany where a record was removed reflects on the other hasMany side - sync', function(assert) {
   let account, user;
   run(() => {
     account = store.push({
@@ -189,40 +189,42 @@ test("Fetching a hasMany where a record was removed reflects on the other hasMan
         id: '2',
         type: 'account',
         attributes: {
-          state: 'lonely'
-        }
-      }
+          state: 'lonely',
+        },
+      },
     });
     user = store.push({
       data: {
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
+          name: 'Stanley',
         },
         relationships: {
           accounts: {
-            data: [{
-              id: '2',
-              type: 'account'
-            }]
-          }
-        }
-      }
+            data: [
+              {
+                id: '2',
+                type: 'account',
+              },
+            ],
+          },
+        },
+      },
     });
     account = store.push({
       data: {
         id: '2',
         type: 'account',
         attributes: {
-          state: 'lonely'
+          state: 'lonely',
         },
         relationships: {
           users: {
-            data: []
-          }
-        }
-      }
+            data: [],
+          },
+        },
+      },
     });
   });
 
@@ -236,7 +238,7 @@ test("Fetching a hasMany where a record was removed reflects on the other hasMan
   Local edits
 */
 
-test("Pushing to a hasMany reflects on the other hasMany side - async", function(assert) {
+test('Pushing to a hasMany reflects on the other hasMany side - async', function(assert) {
   assert.expect(1);
   let user, topic;
 
@@ -246,23 +248,23 @@ test("Pushing to a hasMany reflects on the other hasMany side - async", function
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
+          name: 'Stanley',
         },
         relationships: {
           topics: {
-            data: []
-          }
-        }
-      }
+            data: [],
+          },
+        },
+      },
     });
     topic = store.push({
       data: {
         id: '2',
         type: 'topic',
         attributes: {
-          title: 'EmberFest was great'
-        }
-      }
+          title: 'EmberFest was great',
+        },
+      },
     });
   });
 
@@ -276,7 +278,7 @@ test("Pushing to a hasMany reflects on the other hasMany side - async", function
   });
 });
 
-test("Pushing to a hasMany reflects on the other hasMany side - sync", function(assert) {
+test('Pushing to a hasMany reflects on the other hasMany side - sync', function(assert) {
   let account, stanley;
   run(() => {
     account = store.push({
@@ -284,18 +286,18 @@ test("Pushing to a hasMany reflects on the other hasMany side - sync", function(
         id: '2',
         type: 'account',
         attributes: {
-          state: 'lonely'
-        }
-      }
+          state: 'lonely',
+        },
+      },
     });
     stanley = store.push({
       data: {
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
-        }
-      }
+          name: 'Stanley',
+        },
+      },
     });
     stanley.get('accounts').pushObject(account);
   });
@@ -305,7 +307,7 @@ test("Pushing to a hasMany reflects on the other hasMany side - sync", function(
   });
 });
 
-test("Removing a record from a hasMany reflects on the other hasMany side - async", function(assert) {
+test('Removing a record from a hasMany reflects on the other hasMany side - async', function(assert) {
   let user, topic;
   run(() => {
     user = store.push({
@@ -313,26 +315,28 @@ test("Removing a record from a hasMany reflects on the other hasMany side - asyn
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
+          name: 'Stanley',
         },
         relationships: {
           topics: {
-            data: [{
-              id: '2',
-              type: 'topic'
-            }]
-          }
-        }
-      }
+            data: [
+              {
+                id: '2',
+                type: 'topic',
+              },
+            ],
+          },
+        },
+      },
     });
     topic = store.push({
       data: {
         id: '2',
         type: 'topic',
         attributes: {
-          title: 'EmberFest was great'
-        }
-      }
+          title: 'EmberFest was great',
+        },
+      },
     });
   });
 
@@ -348,7 +352,7 @@ test("Removing a record from a hasMany reflects on the other hasMany side - asyn
   });
 });
 
-test("Removing a record from a hasMany reflects on the other hasMany side - sync", function(assert) {
+test('Removing a record from a hasMany reflects on the other hasMany side - sync', function(assert) {
   let account, user;
   run(() => {
     account = store.push({
@@ -356,26 +360,28 @@ test("Removing a record from a hasMany reflects on the other hasMany side - sync
         id: '2',
         type: 'account',
         attributes: {
-          state: 'lonely'
-        }
-      }
+          state: 'lonely',
+        },
+      },
     });
     user = store.push({
       data: {
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
+          name: 'Stanley',
         },
         relationships: {
           accounts: {
-            data: [{
-              id: '2',
-              type: 'account'
-            }]
-          }
-        }
-      }
+            data: [
+              {
+                id: '2',
+                type: 'account',
+              },
+            ],
+          },
+        },
+      },
     });
   });
 
@@ -391,7 +397,7 @@ test("Removing a record from a hasMany reflects on the other hasMany side - sync
   Rollback Attributes tests
 */
 
-test("Rollbacking attributes for a deleted record that has a ManyToMany relationship works correctly - async", function(assert) {
+test('Rollbacking attributes for a deleted record that has a ManyToMany relationship works correctly - async', function(assert) {
   let user, topic;
   run(() => {
     user = store.push({
@@ -399,26 +405,28 @@ test("Rollbacking attributes for a deleted record that has a ManyToMany relation
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
+          name: 'Stanley',
         },
         relationships: {
           topics: {
-            data: [{
-              id: '2',
-              type: 'topic'
-            }]
-          }
-        }
-      }
+            data: [
+              {
+                id: '2',
+                type: 'topic',
+              },
+            ],
+          },
+        },
+      },
     });
     topic = store.push({
       data: {
         id: '2',
         type: 'topic',
         attributes: {
-          title: 'EmberFest was great'
-        }
-      }
+          title: 'EmberFest was great',
+        },
+      },
     });
   });
 
@@ -436,14 +444,11 @@ test("Rollbacking attributes for a deleted record that has a ManyToMany relation
       assert.equal(fetchedTopics.get('length'), 1, 'Topic got rollbacked into the user');
     });
 
-    return EmberPromise.all([
-      users,
-      topics
-    ]);
+    return EmberPromise.all([users, topics]);
   });
 });
 
-test("Deleting a record that has a hasMany relationship removes it from the otherMany array but does not remove the other record from itself - sync", function(assert) {
+test('Deleting a record that has a hasMany relationship removes it from the otherMany array but does not remove the other record from itself - sync', function(assert) {
   let account, user;
   run(() => {
     account = store.push({
@@ -451,26 +456,28 @@ test("Deleting a record that has a hasMany relationship removes it from the othe
         id: '2',
         type: 'account',
         attributes: {
-          state: 'lonely'
-        }
-      }
+          state: 'lonely',
+        },
+      },
     });
     user = store.push({
       data: {
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
+          name: 'Stanley',
         },
         relationships: {
           accounts: {
-            data: [{
-              id: '2',
-              type: 'account'
-            }]
-          }
-        }
-      }
+            data: [
+              {
+                id: '2',
+                type: 'account',
+              },
+            ],
+          },
+        },
+      },
     });
   });
 
@@ -482,7 +489,7 @@ test("Deleting a record that has a hasMany relationship removes it from the othe
   });
 });
 
-test("Rollbacking attributes for a created record that has a ManyToMany relationship works correctly - async", function(assert) {
+test('Rollbacking attributes for a created record that has a ManyToMany relationship works correctly - async', function(assert) {
   let user, topic;
   run(() => {
     user = store.push({
@@ -490,9 +497,9 @@ test("Rollbacking attributes for a created record that has a ManyToMany relation
         id: '1',
         type: 'user',
         attributes: {
-          name: 'Stanley'
-        }
-      }
+          name: 'Stanley',
+        },
+      },
     });
 
     topic = store.createRecord('topic');
@@ -513,15 +520,12 @@ test("Rollbacking attributes for a created record that has a ManyToMany relation
         assert.equal(fetchedTopics.objectAt(0), null, "Topic can't be fetched");
       });
 
-      return EmberPromise.all([
-        users,
-        topics
-      ]);
+      return EmberPromise.all([users, topics]);
     });
   });
 });
 
-test("Deleting an unpersisted record via rollbackAttributes that has a hasMany relationship removes it from the otherMany array but does not remove the other record from itself - sync", function(assert) {
+test('Deleting an unpersisted record via rollbackAttributes that has a hasMany relationship removes it from the otherMany array but does not remove the other record from itself - sync', function(assert) {
   let account, user;
   run(() => {
     account = store.push({
@@ -529,9 +533,9 @@ test("Deleting an unpersisted record via rollbackAttributes that has a hasMany r
         id: '2',
         type: 'account',
         attributes: {
-          state: 'lonely'
-        }
-      }
+          state: 'lonely',
+        },
+      },
     });
 
     user = store.createRecord('user');
@@ -546,75 +550,100 @@ test("Deleting an unpersisted record via rollbackAttributes that has a hasMany r
   assert.equal(user.get('accounts.length'), 0, 'Accounts got rolledback correctly');
 });
 
-test("Re-loading a removed record should re add it to the relationship when the removed record is the last one in the relationship", function(assert) {
-  let account, ada, byron;
+todo(
+  'Re-loading a removed record should re add it to the relationship when the removed record is the last one in the relationship',
+  function(assert) {
+    assert.expect(4);
+    let account, ada, byron;
 
-  run(() => {
-    account = store.push({
-      data: {
-        id: '2',
-        type: 'account',
-        attributes: {
-          state: 'account 1'
-        }
-      }
-    });
-    ada = store.push({
-      data: {
-        id: '1',
-        type: 'user',
-        attributes: {
-          name: 'Ada Lovelace'
+    run(() => {
+      account = store.push({
+        data: {
+          id: '2',
+          type: 'account',
+          attributes: {
+            state: 'account 1',
+          },
         },
-        relationships: {
-          accounts: {
-            data: [{
-              id: '2',
-              type: 'account'
-            }]
-          }
-        }
-      }
-    });
-    byron = store.push({
-      data: {
-        id: '2',
-        type: 'user',
-        attributes: {
-          name: 'Lord Byron'
+      });
+      ada = store.push({
+        data: {
+          id: '1',
+          type: 'user',
+          attributes: {
+            name: 'Ada Lovelace',
+          },
+          relationships: {
+            accounts: {
+              data: [
+                {
+                  id: '2',
+                  type: 'account',
+                },
+              ],
+            },
+          },
         },
-        relationships: {
-          accounts: {
-            data: [{
-              id: '2',
-              type: 'account'
-            }]
-          }
-        }
-      }
-    });
-    account.get('users').removeObject(byron);
-    account = store.push({
-      data: {
-        id: '2',
-        type: 'account',
-        attributes: {
-          state: 'account 1'
+      });
+      byron = store.push({
+        data: {
+          id: '2',
+          type: 'user',
+          attributes: {
+            name: 'Lord Byron',
+          },
+          relationships: {
+            accounts: {
+              data: [
+                {
+                  id: '2',
+                  type: 'account',
+                },
+              ],
+            },
+          },
         },
-        relationships: {
-          users: {
-            data: [{
-              id: '1',
-              type: 'user'
-            }, {
-              id: '2',
-              type: 'user'
-            }]
-          }
-        }
-      }
+      });
+      account.get('users').removeObject(byron);
+      account = store.push({
+        data: {
+          id: '2',
+          type: 'account',
+          attributes: {
+            state: 'account 1',
+          },
+          relationships: {
+            users: {
+              data: [
+                {
+                  id: '1',
+                  type: 'user',
+                },
+                {
+                  id: '2',
+                  type: 'user',
+                },
+              ],
+            },
+          },
+        },
+      });
     });
-  });
 
-  assert.equal(account.get('users.length'), 2, 'Accounts were updated correctly');
-});
+    let state = account.hasMany('users').hasManyRelationship.canonicalMembers.list;
+    let users = account.get('users');
+
+    assert.todo.equal(users.get('length'), 1, 'Accounts were updated correctly (ui state)');
+    assert.todo.deepEqual(
+      users.map(r => get(r, 'id')),
+      ['1'],
+      'Accounts were updated correctly (ui state)'
+    );
+    assert.equal(state.length, 2, 'Accounts were updated correctly (server state)');
+    assert.deepEqual(
+      state.map(r => r.id),
+      ['1', '2'],
+      'Accounts were updated correctly (server state)'
+    );
+  }
+);

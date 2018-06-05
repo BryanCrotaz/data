@@ -3,7 +3,7 @@ language: node_js
 sudo: false
 dist: trusty
 node_js:
-  - "4"
+  - "6"
 
 addons:
   chrome: stable
@@ -11,11 +11,20 @@ addons:
 cache:
   yarn: true
 
+branches:
+  only:
+    - master
+    - beta
+    - release
+    # npm version tags
+    - /^v\d+\.\d+\.\d+/
+
 stages:
   - test
   - additional tests
   - older version tests
-  - deploy
+  - name: deploy
+    if: type = push AND (branch IN (master, beta, release) OR tag IS present)
 
 jobs:
   fail_fast: true
@@ -26,6 +35,7 @@ jobs:
       env: NAME=test                  # used only to make Travis UI show description
       script:
         - ./bin/lint-features
+        - yarn lint:js
         - yarn test
 
     - stage: additional tests
@@ -54,10 +64,10 @@ jobs:
     - env: EMBER_TRY_SCENARIO=ember-canary
 
     - stage: deploy
-      if: branch IN (master, beta, release) OR tag IS present
       env: NAME=publish                # used only to make Travis UI show description
       install: yarn install
       script:
+        - node_modules/.bin/ember try:reset
         - yarn build:production
         - "./bin/publish-builds"
 

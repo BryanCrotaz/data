@@ -8,10 +8,10 @@ import DS from 'ember-data';
 
 var Post, env;
 
-module("integration/records/save - Save Record", {
+module('integration/records/save - Save Record', {
   beforeEach() {
     Post = DS.Model.extend({
-      title: DS.attr('string')
+      title: DS.attr('string'),
     });
 
     env = setupStore({ post: Post });
@@ -19,15 +19,12 @@ module("integration/records/save - Save Record", {
 
   afterEach() {
     run(env.container, 'destroy');
-  }
+  },
 });
 
-test("Will resolve save on success", function(assert) {
+test('Will resolve save on success', function(assert) {
   assert.expect(4);
-  var post;
-  run(function() {
-    post = env.store.createRecord('post', { title: 'toto' });
-  });
+  let post = env.store.createRecord('post', { title: 'toto' });
 
   var deferred = defer();
   env.adapter.createRecord = function(store, type, snapshot) {
@@ -44,16 +41,13 @@ test("Will resolve save on success", function(assert) {
     saved.then(function(model) {
       assert.ok(true, 'save operation was resolved');
       assert.equal(saved.get('id'), 123);
-      assert.equal(model, post, "resolves with the model");
+      assert.equal(model, post, 'resolves with the model');
     });
   });
 });
 
-test("Will reject save on error", function(assert) {
-  var post;
-  run(function() {
-    post = env.store.createRecord('post', { title: 'toto' });
-  });
+test('Will reject save on error', function(assert) {
+  let post = env.store.createRecord('post', { title: 'toto' });
 
   env.adapter.createRecord = function(store, type, snapshot) {
     var error = new DS.InvalidError([{ title: 'not valid' }]);
@@ -62,17 +56,17 @@ test("Will reject save on error", function(assert) {
   };
 
   run(function() {
-    post.save().then(function() {}, function() {
-      assert.ok(true, 'save operation was rejected');
-    });
+    post.save().then(
+      function() {},
+      function() {
+        assert.ok(true, 'save operation was rejected');
+      }
+    );
   });
 });
 
-test("Retry is allowed in a failure handler", function(assert) {
-  var post;
-  run(function() {
-    post = env.store.createRecord('post', { title: 'toto' });
-  });
+test('Retry is allowed in a failure handler', function(assert) {
+  let post = env.store.createRecord('post', { title: 'toto' });
 
   var count = 0;
 
@@ -87,21 +81,23 @@ test("Retry is allowed in a failure handler", function(assert) {
   };
 
   run(function() {
-    post.save().then(function() {}, function() {
-      return post.save();
-    }).then(function(post) {
-      assert.equal(post.get('id'), '123', "The post ID made it through");
-    });
+    post
+      .save()
+      .then(
+        function() {},
+        function() {
+          return post.save();
+        }
+      )
+      .then(function(post) {
+        assert.equal(post.get('id'), '123', 'The post ID made it through');
+      });
   });
 });
 
-test("Repeated failed saves keeps the record in uncommited state", function(assert) {
+test('Repeated failed saves keeps the record in uncommited state', function(assert) {
   assert.expect(4);
-  var post;
-
-  run(function() {
-    post = env.store.createRecord('post', { title: 'toto' });
-  });
+  let post = env.store.createRecord('post', { title: 'toto' });
 
   env.adapter.createRecord = function(store, type, snapshot) {
     return reject();
@@ -120,20 +116,16 @@ test("Repeated failed saves keeps the record in uncommited state", function(asse
   });
 });
 
-test("Repeated failed saves with invalid error marks the record as invalid", function(assert) {
+test('Repeated failed saves with invalid error marks the record as invalid', function(assert) {
   assert.expect(2);
-  var post;
-
-  run(function() {
-    post = env.store.createRecord('post', { title: 'toto' });
-  });
+  let post = env.store.createRecord('post', { title: 'toto' });
 
   env.adapter.createRecord = function(store, type, snapshot) {
     var error = new DS.InvalidError([
       {
         detail: 'is invalid',
-        source: { pointer: 'data/attributes/title' }
-      }
+        source: { pointer: 'data/attributes/title' },
+      },
     ]);
 
     return reject(error);
@@ -150,13 +142,9 @@ test("Repeated failed saves with invalid error marks the record as invalid", fun
   });
 });
 
-test("Repeated failed saves with invalid error without payload marks the record as invalid", function(assert) {
+test('Repeated failed saves with invalid error without payload marks the record as invalid', function(assert) {
   assert.expect(2);
-  var post;
-
-  run(function() {
-    post = env.store.createRecord('post', { title: 'toto' });
-  });
+  let post = env.store.createRecord('post', { title: 'toto' });
 
   env.adapter.createRecord = function(store, type, snapshot) {
     var error = new DS.InvalidError();
@@ -175,12 +163,9 @@ test("Repeated failed saves with invalid error without payload marks the record 
   });
 });
 
-test("Will reject save on invalid", function(assert) {
+test('Will reject save on invalid', function(assert) {
   assert.expect(1);
-  var post;
-  run(function() {
-    post = env.store.createRecord('post', { title: 'toto' });
-  });
+  let post = env.store.createRecord('post', { title: 'toto' });
 
   env.adapter.createRecord = function(store, type, snapshot) {
     var error = new DS.InvalidError([{ title: 'not valid' }]);
@@ -189,8 +174,11 @@ test("Will reject save on invalid", function(assert) {
   };
 
   run(function() {
-    post.save().then(function() {}, function() {
-      assert.ok(true, 'save operation was rejected');
-    });
+    post.save().then(
+      function() {},
+      function() {
+        assert.ok(true, 'save operation was rejected');
+      }
+    );
   });
 });

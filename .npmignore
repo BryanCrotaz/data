@@ -4,9 +4,9 @@
 /node-tests
 /tests
 /tmp
-/benchmarks
 /bin
 /docs
+/.node_modules.ember-try
 
 **/.gitkeep
 .appveyor.yml
@@ -25,3 +25,5 @@ testem.js
 *.gemspec
 **/*.rb
 node-tests/
+lib/yuidoc.js
+lib/version-replace.js

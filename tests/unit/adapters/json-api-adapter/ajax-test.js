@@ -1,4 +1,3 @@
-import { computed } from '@ember/object';
 import { run } from '@ember/runloop';
 import setupStore from 'dummy/tests/helpers/store';
 
@@ -8,7 +7,7 @@ import DS from 'ember-data';
 
 let Person, Place, store, adapter, env;
 
-module("unit/adapters/json-api-adapter/ajax - building requests", {
+module('unit/adapters/json-api-adapter/ajax - building requests', {
   beforeEach() {
     Person = { modelName: 'person' };
     Place = { modelName: 'place' };
@@ -22,7 +21,7 @@ module("unit/adapters/json-api-adapter/ajax - building requests", {
       store.destroy();
       env.container.destroy();
     });
-  }
+  },
 });
 
 test('ajaxOptions() adds Accept when no other headers exist', function(assert) {
@@ -33,7 +32,7 @@ test('ajaxOptions() adds Accept when no other headers exist', function(assert) {
   let fakeXHR = {
     setRequestHeader(key, value) {
       receivedHeaders.push([key, value]);
-    }
+    },
   };
   ajaxOptions.beforeSend(fakeXHR);
   assert.deepEqual(receivedHeaders, [['Accept', 'application/vnd.api+json']], 'headers assigned');
@@ -48,16 +47,18 @@ test('ajaxOptions() adds Accept header to existing headers', function(assert) {
   let fakeXHR = {
     setRequestHeader(key, value) {
       receivedHeaders.push([key, value]);
-    }
+    },
   };
   ajaxOptions.beforeSend(fakeXHR);
-  assert.deepEqual(receivedHeaders, [['Accept', 'application/vnd.api+json'], ['Other-key', 'Other Value']], 'headers assigned');
+  assert.deepEqual(
+    receivedHeaders,
+    [['Accept', 'application/vnd.api+json'], ['Other-key', 'Other Value']],
+    'headers assigned'
+  );
 });
 
 test('ajaxOptions() adds Accept header to existing computed properties headers', function(assert) {
-  adapter.headers = computed(function() {
-    return { 'Other-key': 'Other Value' };
-  });
+  adapter.headers = { 'Other-key': 'Other Value' };
   let url = 'example.com';
   let type = 'GET';
   let ajaxOptions = adapter.ajaxOptions(url, type, {});
@@ -65,8 +66,12 @@ test('ajaxOptions() adds Accept header to existing computed properties headers',
   let fakeXHR = {
     setRequestHeader(key, value) {
       receivedHeaders.push([key, value]);
-    }
+    },
   };
   ajaxOptions.beforeSend(fakeXHR);
-  assert.deepEqual(receivedHeaders, [['Accept', 'application/vnd.api+json'], ['Other-key', 'Other Value']], 'headers assigned');
+  assert.deepEqual(
+    receivedHeaders,
+    [['Accept', 'application/vnd.api+json'], ['Other-key', 'Other Value']],
+    'headers assigned'
+  );
 });

@@ -1,5 +1,6 @@
-#!/usr/bin/env node
-
+// This publish script remains in order to publish the yui-docs to S3, builds no
+//   longer need to be published to S3.
+//
 // To invoke this from the commandline you need the following to env vars to exist:
 //
 // S3_BUCKET_NAME
@@ -16,5 +17,5 @@
 // ```
 var S3Publisher = require('ember-publisher');
 var configPath = require('path').join(__dirname, '../config/s3ProjectConfig.js');
-var publisher = new S3Publisher({projectConfigPath: configPath});
+var publisher = new S3Publisher({ projectConfigPath: configPath });
 publisher.publish();

@@ -8,10 +8,10 @@ import DS from 'ember-data';
 
 let Post, env;
 
-module("integration/records/collection_save - Save Collection of Records", {
+module('integration/records/collection_save - Save Collection of Records', {
   beforeEach() {
     Post = DS.Model.extend({
-      title: DS.attr('string')
+      title: DS.attr('string'),
     });
 
     env = setupStore({ post: Post });
@@ -19,21 +19,20 @@ module("integration/records/collection_save - Save Collection of Records", {
 
   afterEach() {
     run(env.container, 'destroy');
-  }
+  },
 });
 
-test("Collection will resolve save on success", function(assert) {
+test('Collection will resolve save on success', function(assert) {
   assert.expect(1);
   let id = 1;
-  run(() => {
-    env.store.createRecord('post', { title: 'Hello' });
-    env.store.createRecord('post', { title: 'World' });
-  });
+
+  env.store.createRecord('post', { title: 'Hello' });
+  env.store.createRecord('post', { title: 'World' });
 
   let posts = env.store.peekAll('post');
 
   env.adapter.createRecord = function(store, type, snapshot) {
-    return resolve({ data: { id: id++ , type: 'post' } });
+    return resolve({ data: { id: id++, type: 'post' } });
   };
 
   return run(() => {
@@ -43,11 +42,9 @@ test("Collection will resolve save on success", function(assert) {
   });
 });
 
-test("Collection will reject save on error", function(assert) {
-  run(() => {
-    env.store.createRecord('post', { title: 'Hello' });
-    env.store.createRecord('post', { title: 'World' });
-  });
+test('Collection will reject save on error', function(assert) {
+  env.store.createRecord('post', { title: 'Hello' });
+  env.store.createRecord('post', { title: 'World' });
 
   let posts = env.store.peekAll('post');
 
@@ -62,11 +59,9 @@ test("Collection will reject save on error", function(assert) {
   });
 });
 
-test("Retry is allowed in a failure handler", function(assert) {
-  run(() => {
-    env.store.createRecord('post', { title: 'Hello' });
-    env.store.createRecord('post', { title: 'World' });
-  });
+test('Retry is allowed in a failure handler', function(assert) {
+  env.store.createRecord('post', { title: 'Hello' });
+  env.store.createRecord('post', { title: 'World' });
 
   let posts = env.store.peekAll('post');
 
@@ -86,23 +81,22 @@ test("Retry is allowed in a failure handler", function(assert) {
   };
 
   return run(() => {
-    return posts.save()
+    return posts
+      .save()
       .catch(() => posts.save())
       .then(post => {
         // the ID here is '2' because the second post saves on the first attempt,
         // while the first post saves on the second attempt
-        assert.equal(posts.get('firstObject.id'), '2', "The post ID made it through");
+        assert.equal(posts.get('firstObject.id'), '2', 'The post ID made it through');
       });
   });
 });
 
-test("Collection will reject save on invalid", function(assert) {
+test('Collection will reject save on invalid', function(assert) {
   assert.expect(1);
 
-  run(() => {
-    env.store.createRecord('post', { title: 'Hello' });
-    env.store.createRecord('post', { title: 'World' });
-  });
+  env.store.createRecord('post', { title: 'Hello' });
+  env.store.createRecord('post', { title: 'World' });
 
   let posts = env.store.peekAll('post');
 
